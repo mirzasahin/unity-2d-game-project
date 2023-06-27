@@ -16,7 +16,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float jumpForce = 10f;
     
-    private enum MovementState { idle, running, jumping, falling}
+    private enum MovementState { idle, running, jumping, falling }
+
+    [SerializeField] private AudioSource jumpSoundEffect;
 
     // Start is called before the first frame update
     private void Start()
@@ -32,10 +34,14 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         dirX = Input.GetAxisRaw("Horizontal"); // Player'ın haritadaki konumu, koordinatı. -1 sol, 1 sağ.
-        rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
+        if(rb.bodyType == RigidbodyType2D.Dynamic)
+        {
+            rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
+        }
 
         if(Input.GetKeyDown("space") && IsGrounded())
         {
+            jumpSoundEffect.Play();
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
         UpdateAnimationState();
