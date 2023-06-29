@@ -20,6 +20,11 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private AudioSource jumpSoundEffect;
 
+    private int maxJumps = 1;
+
+    private int _jumpsLeft;
+
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -28,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
         player = GetComponent<Transform>();
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
+        _jumpsLeft = maxJumps;
     }
 
     // Update is called once per frame
@@ -39,10 +45,25 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
         }
 
-        if(Input.GetKeyDown("space") && IsGrounded())
+        if(IsGrounded() && rb.velocity.y < 0)
         {
-            jumpSoundEffect.Play();
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            _jumpsLeft = maxJumps;
+        }
+
+        if(Input.GetKeyDown("space"))
+        {
+            if(IsGrounded())
+            {
+                jumpSoundEffect.Play();
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            }
+
+            if(!IsGrounded() && _jumpsLeft > 0)
+            {
+                jumpSoundEffect.Play();
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                _jumpsLeft -= 1;
+            }
         }
         UpdateAnimationState();
     }
