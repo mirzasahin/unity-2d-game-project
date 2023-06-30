@@ -16,13 +16,15 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float jumpForce = 10f;
     
-    private enum MovementState { idle, running, jumping, falling }
+    private enum MovementState { idle, running, jumping, falling, doublejumping}
 
     [SerializeField] private AudioSource jumpSoundEffect;
 
     private int maxJumps = 1;
 
     private int _jumpsLeft;
+
+    private bool isDoubleJumping = false;
 
 
     // Start is called before the first frame update
@@ -45,11 +47,6 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
         }
 
-        if(IsGrounded() && rb.velocity.y < 0)
-        {
-            _jumpsLeft = maxJumps;
-        }
-
         if(Input.GetKeyDown("space"))
         {
             if(IsGrounded())
@@ -61,12 +58,29 @@ public class PlayerMovement : MonoBehaviour
             if(!IsGrounded() && _jumpsLeft > 0)
             {
                 jumpSoundEffect.Play();
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce - 3f);
                 _jumpsLeft -= 1;
+                isDoubleJumping = true;
+
             }
         }
+        
+        if(IsGrounded() && rb.velocity.y < 0)
+        {
+            _jumpsLeft = maxJumps;
+        }
+
         UpdateAnimationState();
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (IsGrounded())
+        {
+            isDoubleJumping = false;
+        }
+    }
+
 
     private void UpdateAnimationState()
     {
@@ -77,7 +91,6 @@ public class PlayerMovement : MonoBehaviour
         {
             state = MovementState.running;
             sprite.flipX = false;
-
         }
         else if(dirX < 0f)
         {
@@ -89,15 +102,24 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.idle;
         }
 
-        if(rb.velocity.y > .1f)
+        if (rb.velocity.y > .1f)
         {
-            state = MovementState.jumping;
+            if(isDoubleJumping)
+            {
+                state = MovementState.doublejumping;
+            }
+            else
+            {
+                state = MovementState.jumping;
+            }
         }
+
         else if(rb.velocity.y < -.1f)
         {
             state = MovementState.falling;
         }
-        
+
+
         anim.SetInteger("state", (int)state);
     }
 

@@ -62703,6 +62703,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4178494896803405010, guid: 46cc3e2381634ba4fa0ace19e6d2ec0d, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4178494896803405011, guid: 46cc3e2381634ba4fa0ace19e6d2ec0d, type: 3}
       propertyPath: cherriesText
       value: 
