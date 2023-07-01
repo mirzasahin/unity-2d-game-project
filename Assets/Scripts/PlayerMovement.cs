@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
     private int _jumpsLeft;
 
     private bool isDoubleJumping = false;
+    public int test;
 
 
     // Start is called before the first frame update
@@ -36,6 +37,8 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
         sprite = GetComponent<SpriteRenderer>();
         _jumpsLeft = maxJumps;
+        test = 0;
+        Debug.Log(test);
     }
 
     // Update is called once per frame
@@ -46,30 +49,33 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
         }
-
-        if(Input.GetKeyDown("space"))
-        {
-            if(IsGrounded())
+       
+            if(Input.GetKeyDown("space") && IsGrounded() && test == 0)
             {
                 jumpSoundEffect.Play();
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                test = 1;
             }
 
-            if(!IsGrounded() && _jumpsLeft > 0)
+            if(Input.GetKeyDown("space") && !IsGrounded() && _jumpsLeft > 0 && test == 1)
             {
-                jumpSoundEffect.Play();
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce - 3f);
-                _jumpsLeft -= 1;
-                isDoubleJumping = true;
-
+                {
+                    jumpSoundEffect.Play();
+                    rb.velocity = new Vector2(rb.velocity.x, jumpForce - 3f);
+                    _jumpsLeft -= 1;
+                    isDoubleJumping = true;
+                    test = 0;
+                }
             }
-        }
+        
         
         if(IsGrounded() && rb.velocity.y < 0)
         {
             _jumpsLeft = maxJumps;
+            test = 0;
         }
 
+    
         UpdateAnimationState();
     }
 
