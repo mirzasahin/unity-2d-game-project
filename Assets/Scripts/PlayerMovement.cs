@@ -27,6 +27,9 @@ public class PlayerMovement : MonoBehaviour
     private bool isDoubleJumping = false;
     private bool jumpInAir;
 
+    public GameObject dustLeft;
+    public GameObject dustRight;
+
 
     // Start is called before the first frame update
     private void Start()
@@ -45,6 +48,9 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         dirX = Input.GetAxisRaw("Horizontal"); // Player'ın haritadaki konumu, koordinatı. -1 sol, 1 sağ.
+        
+        dustAnimation();
+
         if(rb.bodyType == RigidbodyType2D.Dynamic)
         {
             rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
@@ -111,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
         if (rb.velocity.y > .1f)
         {
             if(isDoubleJumping)
-            {
+            {   
                 state = MovementState.doublejumping;
             }
             else
@@ -128,6 +134,27 @@ public class PlayerMovement : MonoBehaviour
 
         anim.SetInteger("state", (int)state);
     }
+
+        public void dustAnimation()
+        {
+            if(dirX > 0 && IsGrounded())
+            {
+                dustLeft.SetActive(true);
+                dustRight.SetActive(false);
+            }
+
+            else if(dirX < 0 && IsGrounded())
+            {
+                dustLeft.SetActive(false);
+                dustRight.SetActive(true);
+            }
+
+            else
+            {
+                dustLeft.SetActive(false);
+                dustRight.SetActive(false);
+            }
+        }
 
     private bool IsGrounded() //BoxCast bize boolean döndürüyor.
     {

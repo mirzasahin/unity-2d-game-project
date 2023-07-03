@@ -12,7 +12,7 @@ public class ItemCollector : MonoBehaviour
 
     private Animator anim;
 
-     private void Start()
+    private void Start()
     {
         anim = GetComponent<Animator>();
     }
@@ -28,3 +28,4 @@ public class ItemCollector : MonoBehaviour
         }
     }
 }
+
