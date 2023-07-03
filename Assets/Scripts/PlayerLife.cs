@@ -21,7 +21,6 @@ public class PlayerLife : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Trap"))    
         {
-            Debug.Log("Çarpttın.");
             Die();
         }
     }
@@ -38,6 +37,4 @@ public class PlayerLife : MonoBehaviour
         Debug.Log(SceneManager.GetActiveScene().name);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-
-   
 }

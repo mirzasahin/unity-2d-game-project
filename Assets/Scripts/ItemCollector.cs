@@ -10,11 +10,17 @@ public class ItemCollector : MonoBehaviour
     [SerializeField] private Text cherriesText;
     [SerializeField] private AudioSource collectionSoundEffect;
 
+    private Animator anim;
+
+     private void Start()
+    {
+        anim = GetComponent<Animator>();
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.CompareTag("Cherry"))
-        {
+        {   
             collectionSoundEffect.Play();
             Destroy(collision.gameObject);
             cherries++;
