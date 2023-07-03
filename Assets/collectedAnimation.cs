@@ -21,8 +21,8 @@ public class collectedAnimation : MonoBehaviour
     {
         if(collision.gameObject.CompareTag("Player"))
         {   
-            anim.SetTrigger("collected");
             SetObjectTransparency(1f);
+            anim.SetTrigger("collected");   
             Invoke("DestroyObject", 0.5f);
         }
         
