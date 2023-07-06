@@ -30,7 +30,6 @@ public class PlayerMovement : MonoBehaviour
     public GameObject dustLeft;
     public GameObject dustRight;
 
-
     // Start is called before the first frame update
     private void Start()
     {
@@ -42,14 +41,18 @@ public class PlayerMovement : MonoBehaviour
         _jumpsLeft = maxJumps;
         jumpInAir = false;
         Debug.Log(jumpInAir);
+        
     }
 
     // Update is called once per frame
     private void Update()
     {
         dirX = Input.GetAxisRaw("Horizontal"); // Player'ın haritadaki konumu, koordinatı. -1 sol, 1 sağ.
-        
-        dustAnimation();
+
+        if(rb.bodyType == RigidbodyType2D.Dynamic)
+        {
+            dustAnimation();
+        }
 
         if(rb.bodyType == RigidbodyType2D.Dynamic)
         {

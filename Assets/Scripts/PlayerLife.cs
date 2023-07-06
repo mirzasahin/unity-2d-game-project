@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,7 +15,6 @@ public class PlayerLife : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         Debug.Log("Oyun başladı.");
-        
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -37,4 +37,7 @@ public class PlayerLife : MonoBehaviour
         Debug.Log(SceneManager.GetActiveScene().name);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+
+   
 }
