@@ -10,13 +10,13 @@ public class PlayerMovement : MonoBehaviour
     private Animator anim;
 
     [SerializeField] private LayerMask jumpableGround;
-    
+
     private float dirX = 0f;
     private SpriteRenderer sprite;
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float jumpForce = 10f;
-    
-    private enum MovementState { idle, running, jumping, falling, doublejumping}
+
+    private enum MovementState { idle, running, jumping, falling, doublejumping }
 
     [SerializeField] private AudioSource jumpSoundEffect;
 
@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isDoubleJumping = false;
     private bool jumpInAir;
+    private bool keyboard;
 
     public GameObject dustLeft;
     public GameObject dustRight;
@@ -40,51 +41,55 @@ public class PlayerMovement : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         _jumpsLeft = maxJumps;
         jumpInAir = false;
+        keyboard = true;
         Debug.Log(jumpInAir);
-        
+
     }
 
     // Update is called once per frame
     private void Update()
     {
-        dirX = Input.GetAxisRaw("Horizontal"); // Player'ın haritadaki konumu, koordinatı. -1 sol, 1 sağ.
+        if(keyboard)
+        {
+            HandleInput();
+        }
 
-        if(rb.bodyType == RigidbodyType2D.Dynamic)
+        if (rb.bodyType == RigidbodyType2D.Dynamic)
         {
             dustAnimation();
         }
 
-        if(rb.bodyType == RigidbodyType2D.Dynamic)
+        if (rb.bodyType == RigidbodyType2D.Dynamic)
         {
             rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y); // Player'ın hızı.
         }
-       
-            if(Input.GetKeyDown("space") && IsGrounded() && jumpInAir == false)
+
+        if (Input.GetKeyDown("space") && IsGrounded() && jumpInAir == false)
+        {
+            jumpSoundEffect.Play();
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            jumpInAir = true;
+        }
+
+        if (Input.GetKeyDown("space") && !IsGrounded() && _jumpsLeft > 0 && jumpInAir == true)
+        {
             {
                 jumpSoundEffect.Play();
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-                jumpInAir = true;
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce - 3f);
+                _jumpsLeft -= 1;
+                isDoubleJumping = true;
+                jumpInAir = false;
             }
+        }
 
-            if(Input.GetKeyDown("space") && !IsGrounded() && _jumpsLeft > 0 && jumpInAir == true)
-            {
-                {
-                    jumpSoundEffect.Play();
-                    rb.velocity = new Vector2(rb.velocity.x, jumpForce - 3f);
-                    _jumpsLeft -= 1;
-                    isDoubleJumping = true;
-                    jumpInAir = false;
-                }
-            }
-        
-        
-        if(IsGrounded() && rb.velocity.y < 0)
+
+        if (IsGrounded() && rb.velocity.y < 0)
         {
             _jumpsLeft = maxJumps;
             jumpInAir = false;
         }
 
-    
+
         UpdateAnimationState();
     }
 
@@ -102,12 +107,12 @@ public class PlayerMovement : MonoBehaviour
 
         MovementState state;
 
-        if(dirX > 0f)
+        if (dirX > 0f)
         {
             state = MovementState.running;
             sprite.flipX = false;
         }
-        else if(dirX < 0f)
+        else if (dirX < 0f)
         {
             state = MovementState.running;
             sprite.flipX = true;
@@ -119,8 +124,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (rb.velocity.y > .1f)
         {
-            if(isDoubleJumping)
-            {   
+            if (isDoubleJumping)
+            {
                 state = MovementState.doublejumping;
             }
             else
@@ -129,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        else if(rb.velocity.y < -.1f)
+        else if (rb.velocity.y < -.1f)
         {
             state = MovementState.falling;
         }
@@ -138,29 +143,75 @@ public class PlayerMovement : MonoBehaviour
         anim.SetInteger("state", (int)state);
     }
 
-        public void dustAnimation()
+    public void dustAnimation()
+    {
+        if (dirX > 0 && IsGrounded())
         {
-            if(dirX > 0 && IsGrounded())
-            {
-                dustLeft.SetActive(true);
-                dustRight.SetActive(false);
-            }
-
-            else if(dirX < 0 && IsGrounded())
-            {
-                dustLeft.SetActive(false);
-                dustRight.SetActive(true);
-            }
-
-            else
-            {
-                dustLeft.SetActive(false);
-                dustRight.SetActive(false);
-            }
+            dustLeft.SetActive(true);
+            dustRight.SetActive(false);
         }
+
+        else if (dirX < 0 && IsGrounded())
+        {
+            dustLeft.SetActive(false);
+            dustRight.SetActive(true);
+        }
+
+        else
+        {
+            dustLeft.SetActive(false);
+            dustRight.SetActive(false);
+        }
+    }
 
     private bool IsGrounded() //BoxCast bize boolean döndürüyor.
     {
-       return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpableGround);
+        return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpableGround);
+    }
+
+    private void HandleInput()
+    {
+        dirX = Input.GetAxisRaw("Horizontal"); // Player'ın haritadaki konumu, koordinatı. -1 sol, 1 sağ.
+        keyboard = true;
+    }
+
+    // Mobile Buttons
+    public void Left()
+    {
+        dirX = -1;
+        keyboard = false;
+    }
+
+    public void Right()
+    {
+        dirX = 1;
+        keyboard = false;
+    }
+
+    public void Stop()
+    {
+        dirX = 0;
+        keyboard = true;
+    }
+
+    public void Jump()
+    {
+        if (IsGrounded() && jumpInAir == false)
+        {
+            jumpSoundEffect.Play();
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            jumpInAir = true;
+        }
+
+        if (!IsGrounded() && _jumpsLeft > 0 && jumpInAir == true)
+        {
+            {
+                jumpSoundEffect.Play();
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce - 3f);
+                _jumpsLeft -= 1;
+                isDoubleJumping = true;
+                jumpInAir = false;
+            }
+        }
     }
 }
